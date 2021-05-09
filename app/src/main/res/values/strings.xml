@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Assistant</string>
+    <string name="heads_up">Heads Up</string>
+    <string name="brightness_model">Auto Brightness</string>
+</resources>
