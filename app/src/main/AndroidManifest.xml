@@ -37,11 +37,19 @@
                 android:name="android.service.quicksettings.ACTIVE_TILE"
                 android:value="true" />
         </service>
+        <service
+            android:name=".NFCSwitchService"
+            android:icon="@drawable/ic_nfc"
+            android:label="@string/nfc_control"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.service.quicksettings.ACTIVE_TILE"
+                android:value="true" />
+        </service>
 
-        <!-- <intent-filter> -->
-        <!-- <action android:name="android.intent.action.ASSIST" /> -->
-        <!-- <category android:name="android.intent.category.DEFAULT" /> -->
-        <!-- </intent-filter> -->
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop">
