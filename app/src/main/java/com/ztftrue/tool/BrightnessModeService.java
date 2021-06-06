@@ -41,6 +41,9 @@ public class BrightnessModeService extends android.service.quicksettings.TileSer
     @Override
     public void onClick() {
         super.onClick();
+        if (!Settings.System.canWrite(this)) {
+            return;
+        }
         Tile tile = getQsTile();
         tile.setIcon(Icon.createWithResource(this,
                 R.drawable.ic_auto_brightness));

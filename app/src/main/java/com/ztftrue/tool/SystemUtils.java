@@ -31,28 +31,21 @@ public class SystemUtils {
         startActivity(intent, context);
     }
 
-    public static String startCommand(String command) {
-        try {
-            Process p = new ProcessBuilder("su").start();
-            try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(p.getOutputStream())); BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
-                writer.write(command);
-                writer.write("\n");
-                writer.write("exit\n");
-                writer.flush();
-                StringBuilder sb = new StringBuilder();
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    sb.append(line);
-                }
-                p.waitFor();
-                return sb.toString();
-            } catch (IOException | InterruptedException e) {
-                e.printStackTrace();
+    public static String startCommand(String command) throws InterruptedException, IOException {
+        Process p = new ProcessBuilder("su").start();
+        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(p.getOutputStream())); BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
+            writer.write(command);
+            writer.write("\n");
+            writer.write("exit\n");
+            writer.flush();
+            StringBuilder sb = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                sb.append(line);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+            p.waitFor();
+            return sb.toString();
         }
-        return "";
     }
 
     private void startActivity(Intent intent, Context context) {
