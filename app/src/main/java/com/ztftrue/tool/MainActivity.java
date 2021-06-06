@@ -3,9 +3,7 @@ package com.ztftrue.tool;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.service.quicksettings.Tile;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
