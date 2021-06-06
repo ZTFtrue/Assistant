@@ -55,6 +55,8 @@ public class NFCSwitchService extends android.service.quicksettings.TileService 
     }
 
     public void dealHeadsUp(Tile tile, Context context) {
+        tile.setState(Tile.STATE_UNAVAILABLE);
+        tile.updateTile();
         Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
             if (!emitter.isDisposed()) {
                 boolean o = getNFCEnable(context);

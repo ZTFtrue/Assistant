@@ -61,10 +61,14 @@ public class HeadsUpNotificationService extends android.service.quicksettings.Ti
     }
 
     public void dealHeadsUp(Tile tile, boolean init) {
+        if (!init) {
+            tile.setState(Tile.STATE_UNAVAILABLE);
+            tile.updateTile();
+        }
         Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
             if (!emitter.isDisposed()) {
                 boolean o = SystemUtils.startCommand("settings get global heads_up_notifications_enabled").equals("1");
-                if(init){
+                if (init) {
                     emitter.onNext(o);
                     emitter.onComplete();
                     return;
