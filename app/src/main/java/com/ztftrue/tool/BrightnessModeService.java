@@ -9,11 +9,6 @@ public class BrightnessModeService extends android.service.quicksettings.TileSer
     public BrightnessModeService() {
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-    }
-
 
     @Override
     public void onTileAdded() {
@@ -28,15 +23,6 @@ public class BrightnessModeService extends android.service.quicksettings.TileSer
         initTile();
     }
 
-    @Override
-    public void onStopListening() {
-        super.onStopListening();
-    }
-
-    @Override
-    public void onTileRemoved() {
-        super.onTileRemoved();
-    }
 
     @Override
     public void onClick() {

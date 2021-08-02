@@ -17,11 +17,6 @@ public class NFCSwitchService extends android.service.quicksettings.TileService 
     public NFCSwitchService() {
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-    }
-
 
     @Override
     public void onTileAdded() {
@@ -33,16 +28,6 @@ public class NFCSwitchService extends android.service.quicksettings.TileService 
     public void onStartListening() {
         super.onStartListening();
         initTile();
-    }
-
-    @Override
-    public void onStopListening() {
-        super.onStopListening();
-    }
-
-    @Override
-    public void onTileRemoved() {
-        super.onTileRemoved();
     }
 
     @Override
@@ -80,7 +65,6 @@ public class NFCSwitchService extends android.service.quicksettings.TileService 
             public void onNext(@NonNull Boolean o) {
                 if (o) {
                     tile.setState(Tile.STATE_ACTIVE);
-                    // TODO
                     tile.setLabel("Turning off");
                 } else {
                     tile.setState(Tile.STATE_INACTIVE);

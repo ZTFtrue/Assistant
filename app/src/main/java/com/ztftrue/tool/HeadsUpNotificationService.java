@@ -17,11 +17,6 @@ public class HeadsUpNotificationService extends android.service.quicksettings.Ti
     public HeadsUpNotificationService() {
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-    }
-
 
     @Override
     public void onTileAdded() {
@@ -39,16 +34,6 @@ public class HeadsUpNotificationService extends android.service.quicksettings.Ti
         tile.setIcon(Icon.createWithResource(this,
                 R.drawable.icon_notification_bel));
         dealHeadsUp(tile, true);
-    }
-
-    @Override
-    public void onStopListening() {
-        super.onStopListening();
-    }
-
-    @Override
-    public void onTileRemoved() {
-        super.onTileRemoved();
     }
 
     @Override

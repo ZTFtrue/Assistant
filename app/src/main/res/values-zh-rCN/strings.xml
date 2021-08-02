@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">快捷磁贴</string>
+    <string name="heads_up">悬浮通知</string>
+    <string name="brightness_model">自动亮度</string>
+    <string name="nfc_control">NFC</string>
+    <string name="click_to_check_su_grant">授权Root权限</string>
+    <string name="click_to_check_setting_grant">授权设置系统权限</string>
+</resources>
