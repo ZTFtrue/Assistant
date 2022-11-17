@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
     }
     public void executeCommand(String command) {
         Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
-                String a = SystemUtils.startCommand(command);
+                SystemUtils.startCommand(command);
                 emitter.onComplete();
         }).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Observer<Boolean>() {
 
