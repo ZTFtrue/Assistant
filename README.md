@@ -22,3 +22,7 @@ settings put global heads_up_notifications_enabled 0
 # settings put system screen_brightness_mode 1
 # settings get system screen_brightness 10
 ```
+
+## TODO
+
+整合命令
