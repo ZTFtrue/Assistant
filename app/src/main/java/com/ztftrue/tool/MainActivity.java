@@ -31,9 +31,34 @@ public class MainActivity extends AppCompatActivity {
         } else if (view.getId() == R.id.setting) {
             Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
             startActivity(intent);
+        } else if (view.getId() == R.id.wifi_cell) {
+            executeCommand("settings put secure sysui_qs_tiles \"$(settings get secure sysui_qs_tiles),wifi,cell\"");
         }
     }
+    public void executeCommand(String command) {
+        Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
+                String a = SystemUtils.startCommand(command);
+                emitter.onComplete();
+        }).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Observer<Boolean>() {
 
+            @Override
+            public void onSubscribe(@NonNull Disposable d) {
+            }
+
+            @Override
+            public void onNext(@NonNull Boolean o) {
+            }
+
+            @Override
+            public void onError(@NonNull Throwable e) {
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onComplete() {
+            }
+        });
+    }
     public void checkSudo() {
         Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
             if (!emitter.isDisposed()) {

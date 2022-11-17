@@ -6,4 +6,5 @@
     <string name="click_to_check_su_grant">Authorize Root permissions </string>
     <string name="click_to_check_setting_grant">Authorize Change Settings permissions</string>
     <string name="remove_network_warn">Remove Network Warn</string>
+    <string name="android12_wifi">Android12 快捷栏 显示 wifi 和 蜂窝按钮</string>
 </resources>
