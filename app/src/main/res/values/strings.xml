@@ -3,6 +3,7 @@
     <string name="heads_up">Heads Up</string>
     <string name="brightness_model">Auto Brightness</string>
     <string name="nfc_control">NFC</string>
+    <string name="shot_screen">Shot Screen</string>
     <string name="click_to_check_su_grant">Authorize Root permissions </string>
     <string name="click_to_check_setting_grant">Authorize Change Settings permissions</string>
     <string name="remove_network_warn">Remove Network Warn</string>

@@ -26,4 +26,10 @@
         android:layout_height="wrap_content"
         android:onClick="onClick"
         android:text="@string/android12_wifi" />
+    <Button
+        android:id="@+id/float_window"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="onClick"
+        android:text="float window" />
 </LinearLayout>

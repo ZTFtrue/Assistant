@@ -4,6 +4,7 @@
     <string name="heads_up">悬浮通知</string>
     <string name="brightness_model">自动亮度</string>
     <string name="nfc_control">NFC</string>
+    <string name="shot_screen">截屏</string>
     <string name="click_to_check_su_grant">授权Root权限</string>
     <string name="click_to_check_setting_grant">授权设置系统权限</string>
     <string name="remove_network_warn">Remove Network Warn</string>

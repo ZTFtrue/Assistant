@@ -3,13 +3,13 @@ plugins {
 }
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 33
     buildToolsVersion "30.0.3"
 
     defaultConfig {
         applicationId "com.ztftrue.tool"
-        minSdkVersion 24
-        targetSdkVersion 30
+        minSdkVersion 29
+        targetSdkVersion 33
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
