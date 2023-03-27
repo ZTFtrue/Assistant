@@ -97,7 +97,7 @@ public class FloatingWindowGFG extends AccessibilityService implements Lifecycle
 
     @SuppressLint("ClickableViewAccessibility")
     public void createFloatWindow() {
-        int viewWidth=80;
+        int viewWidth = 80;
         DisplayMetrics metrics = getResources().getDisplayMetrics();
         int width = metrics.widthPixels;
         int height = metrics.heightPixels;
@@ -108,7 +108,7 @@ public class FloatingWindowGFG extends AccessibilityService implements Lifecycle
         floatView = (ViewGroup) inflater.inflate(R.layout.float_view_layout, null);
         WindowManager.LayoutParams layoutParam = new WindowManager.LayoutParams(
                 viewWidth,
-                250,
+                240,
                 WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
                 WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                 PixelFormat.TRANSPARENT
@@ -119,10 +119,12 @@ public class FloatingWindowGFG extends AccessibilityService implements Lifecycle
         windowManager.getDefaultDisplay().getMetrics(metrics);
         floatView.setLayoutParams(new FrameLayout.LayoutParams(viewWidth, 250));
         floatView.setOnClickListener(v -> {
+            windowManager.removeView(v);
             try {
                 SystemUtils.startCommand("screencap -p " +
                         Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) +
                         File.separator + System.currentTimeMillis() + ".png");
+                windowManager.addView(v, layoutParam);
             } catch (InterruptedException | IOException e) {
                 throw new RuntimeException(e);
             }
