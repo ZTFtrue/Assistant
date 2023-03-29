@@ -85,6 +85,9 @@ public class MainActivity extends AppCompatActivity {
             executeCommand("settings put secure sysui_qs_tiles \"$(settings get secure sysui_qs_tiles),wifi,cell\"");
         } else if (view.getId() == R.id.float_window) {
             FloatingWindowGFG.isShowWindow.postValue(true);
+        } else if (view.getId() == R.id.close_screen_orientation) {
+//            https://source.android.com/docs/core/display/rotate-suggestions?hl=zh-cn
+            executeCommand("settings put secure show_rotation_suggestions");
         }
     }
 
