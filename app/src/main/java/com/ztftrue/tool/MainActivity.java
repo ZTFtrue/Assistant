@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        checkAccessibilityPermission(this);
+        checkAccessibilityPermission(this, false);
     }
 
     /**
@@ -55,10 +55,10 @@ public class MainActivity extends AppCompatActivity {
         context.startActivity(intent);
     }
 
-    private void checkAccessibilityPermission(Activity context) {
+    private void checkAccessibilityPermission(Activity context, boolean auto) {
         if (isMyServiceRunning()) {
             FloatingWindowGFG.isShowWindow.postValue(true);
-        } else {
+        } else if (auto) {
             accessibilityToSettingPage(context);
         }
     }
@@ -84,7 +84,8 @@ public class MainActivity extends AppCompatActivity {
         } else if (view.getId() == R.id.wifi_cell) {
             executeCommand("settings put secure sysui_qs_tiles \"$(settings get secure sysui_qs_tiles),wifi,cell\"");
         } else if (view.getId() == R.id.float_window) {
-            FloatingWindowGFG.isShowWindow.postValue(true);
+            checkAccessibilityPermission(MainActivity.this,true);
+//            FloatingWindowGFG.isShowWindow.postValue(true);
         } else if (view.getId() == R.id.close_screen_orientation) {
 //            https://source.android.com/docs/core/display/rotate-suggestions?hl=zh-cn
             executeCommand("settings put secure show_rotation_suggestions");

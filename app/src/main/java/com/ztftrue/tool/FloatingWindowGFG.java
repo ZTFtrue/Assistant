@@ -63,12 +63,12 @@ public class FloatingWindowGFG extends AccessibilityService implements Lifecycle
         mLifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_CREATE);
         initObserve();
     }
-
+Handler handler= new Handler();
     /**
      * 打开关闭的订阅
      */
     private void initObserve() {
-        new Handler().postDelayed(new Runnable() {
+        handler .postDelayed(new Runnable() {
             @Override
             public void run() {
                 createFloatWindow();
@@ -97,18 +97,16 @@ public class FloatingWindowGFG extends AccessibilityService implements Lifecycle
 
     @SuppressLint("ClickableViewAccessibility")
     public void createFloatWindow() {
-        int viewWidth = 80;
+        int viewWidth = 120;
         DisplayMetrics metrics = getResources().getDisplayMetrics();
         int width = metrics.widthPixels;
         int height = metrics.heightPixels;
         windowManager = (WindowManager) FloatingWindowGFG.this.getSystemService(WINDOW_SERVICE);
-//        ActivityFloatItemBinding =
-//                ActivityFloatItemBinding.inflate(LayoutInflater.from(this));
         LayoutInflater inflater = (LayoutInflater) getBaseContext().getSystemService(LAYOUT_INFLATER_SERVICE);
         floatView = (ViewGroup) inflater.inflate(R.layout.float_view_layout, null);
         WindowManager.LayoutParams layoutParam = new WindowManager.LayoutParams(
                 viewWidth,
-                240,
+                140,
                 WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
                 WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                 PixelFormat.TRANSPARENT
@@ -124,7 +122,12 @@ public class FloatingWindowGFG extends AccessibilityService implements Lifecycle
                 SystemUtils.startCommand("screencap -p " +
                         Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) +
                         File.separator + System.currentTimeMillis() + ".png");
-                windowManager.addView(v, layoutParam);
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        windowManager.addView(v, layoutParam);
+                    }
+                },800);
             } catch (InterruptedException | IOException e) {
                 throw new RuntimeException(e);
             }
