@@ -117,7 +117,8 @@ Handler handler= new Handler();
         windowManager.getDefaultDisplay().getMetrics(metrics);
         floatView.setLayoutParams(new FrameLayout.LayoutParams(viewWidth, 250));
         floatView.setOnClickListener(v -> {
-            windowManager.removeView(v);
+            v.setBackground(ResourcesCompat.getDrawable(getResources(),R.drawable.trasparent_color,null));
+            windowManager.updateViewLayout(v,layoutParam);
             try {
                 SystemUtils.startCommand("screencap -p " +
                         Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) +
@@ -125,7 +126,8 @@ Handler handler= new Handler();
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        windowManager.addView(v, layoutParam);
+                        v.setBackground(ResourcesCompat.getDrawable(getResources(),R.drawable.radius_color,null));
+                        windowManager.updateViewLayout(v, layoutParam);
                     }
                 },800);
             } catch (InterruptedException | IOException e) {
