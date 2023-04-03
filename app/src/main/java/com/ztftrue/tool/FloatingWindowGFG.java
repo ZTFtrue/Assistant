@@ -11,6 +11,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
+import android.service.quicksettings.Tile;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
@@ -34,10 +35,24 @@ import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LifecycleRegistry;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
 
 import java.io.File;
 import java.io.IOException;
+
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Flowable;
+import io.reactivex.rxjava3.core.FlowableEmitter;
+import io.reactivex.rxjava3.core.FlowableOnSubscribe;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.ObservableOnSubscribe;
+import io.reactivex.rxjava3.core.Observer;
+import io.reactivex.rxjava3.core.Single;
+import io.reactivex.rxjava3.core.SingleEmitter;
+import io.reactivex.rxjava3.core.SingleObserver;
+import io.reactivex.rxjava3.core.SingleOnSubscribe;
+import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.internal.operators.single.SingleToObservable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class FloatingWindowGFG extends AccessibilityService implements LifecycleOwner {
     public static MutableLiveData<Boolean> isShowWindow = new MutableLiveData<Boolean>(false);
@@ -63,12 +78,14 @@ public class FloatingWindowGFG extends AccessibilityService implements Lifecycle
         mLifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_CREATE);
         initObserve();
     }
-Handler handler= new Handler();
+
+    Handler handler = new Handler();
+
     /**
      * 打开关闭的订阅
      */
     private void initObserve() {
-        handler .postDelayed(new Runnable() {
+        handler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 createFloatWindow();
@@ -117,22 +134,31 @@ Handler handler= new Handler();
         windowManager.getDefaultDisplay().getMetrics(metrics);
         floatView.setLayoutParams(new FrameLayout.LayoutParams(viewWidth, 250));
         floatView.setOnClickListener(v -> {
-            v.setBackground(ResourcesCompat.getDrawable(getResources(),R.drawable.trasparent_color,null));
-            windowManager.updateViewLayout(v,layoutParam);
-            try {
+            v.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.trasparent_color, null));
+            windowManager.updateViewLayout(v, layoutParam);
+            Single.create((SingleOnSubscribe<Boolean>) emitter -> {
                 SystemUtils.startCommand("screencap -p " +
                         Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) +
                         File.separator + System.currentTimeMillis() + ".png");
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        v.setBackground(ResourcesCompat.getDrawable(getResources(),R.drawable.radius_color,null));
-                        windowManager.updateViewLayout(v, layoutParam);
-                    }
-                },800);
-            } catch (InterruptedException | IOException e) {
-                throw new RuntimeException(e);
-            }
+                emitter.onSuccess(true);
+            }).subscribeOn(Schedulers.single()).observeOn(AndroidSchedulers.mainThread()).subscribe(new SingleObserver<Boolean>() {
+                @Override
+                public void onSubscribe(@io.reactivex.rxjava3.annotations.NonNull Disposable d) {
+
+                }
+
+                @Override
+                public void onSuccess(@io.reactivex.rxjava3.annotations.NonNull Boolean aBoolean) {
+                    v.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.radius_color, null));
+                    Toast.makeText(v.getContext(), "s", Toast.LENGTH_SHORT).show();
+                    windowManager.updateViewLayout(v, layoutParam);
+                }
+
+                @Override
+                public void onError(@io.reactivex.rxjava3.annotations.NonNull Throwable e) {
+
+                }
+            });
         });
         floatView.setOnTouchListener(new View.OnTouchListener() {
 
