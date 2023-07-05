@@ -114,7 +114,8 @@ public class FloatingWindowGFG extends AccessibilityService implements Lifecycle
 
     @SuppressLint("ClickableViewAccessibility")
     public void createFloatWindow() {
-        int viewWidth = 120;
+        int viewWidth = 150;
+        int viewHeight = 150;
         DisplayMetrics metrics = getResources().getDisplayMetrics();
         int width = metrics.widthPixels;
         int height = metrics.heightPixels;
@@ -123,7 +124,7 @@ public class FloatingWindowGFG extends AccessibilityService implements Lifecycle
         floatView = (ViewGroup) inflater.inflate(R.layout.float_view_layout, null);
         WindowManager.LayoutParams layoutParam = new WindowManager.LayoutParams(
                 viewWidth,
-                140,
+                viewHeight,
                 WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
                 WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                 PixelFormat.TRANSPARENT
@@ -132,7 +133,7 @@ public class FloatingWindowGFG extends AccessibilityService implements Lifecycle
         layoutParam.x = 0;
         layoutParam.y = 0;
         windowManager.getDefaultDisplay().getMetrics(metrics);
-        floatView.setLayoutParams(new FrameLayout.LayoutParams(viewWidth, 250));
+        floatView.setLayoutParams(new FrameLayout.LayoutParams(viewWidth, viewHeight));
         floatView.setOnClickListener(v -> {
             v.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.trasparent_color, null));
             windowManager.updateViewLayout(v, layoutParam);
