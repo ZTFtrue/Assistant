@@ -3,6 +3,14 @@ plugins {
 }
 
 android {
+    signingConfigs {
+        debug {
+            storeFile file('./develope.jks')
+            storePassword '123456'
+            keyAlias 'develope'
+            keyPassword '123456'
+        }
+    }
     compileSdkVersion 33
     buildToolsVersion "30.0.3"
 
