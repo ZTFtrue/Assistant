@@ -99,8 +99,8 @@ public class FloatingWindowGFG extends AccessibilityService implements Lifecycle
 
     WindowManager windowManager;
     ViewGroup floatView;
-    int viewWidth = 100;
-    int viewHeight = 500;
+    int viewWidth = 200;
+    int viewHeight = 600;
     boolean isMoveButton = false;
     WindowManager.LayoutParams layoutParam;
     @SuppressLint("ClickableViewAccessibility")
@@ -189,14 +189,10 @@ public class FloatingWindowGFG extends AccessibilityService implements Lifecycle
 
             @Override
             public boolean onSingleTapUp(@NonNull MotionEvent e) {
-
-                floatView.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.trasparent_color, null));
-
+                floatView.setVisibility(View.GONE);
                 windowManager.updateViewLayout(floatView, layoutParam);
                 Single.create((SingleOnSubscribe<Boolean>) emitter -> {
-                    SystemUtils.startCommand("screencap -p " +
-                            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) +
-                            File.separator + System.currentTimeMillis() + ".png");
+                    SystemUtils.startCommand("input tap "+e.getRawX()+" "+e.getRawY());
                     emitter.onSuccess(true);
                 }).subscribeOn(Schedulers.single()).observeOn(AndroidSchedulers.mainThread()).subscribe(new SingleObserver<Boolean>() {
                     @Override
@@ -206,7 +202,7 @@ public class FloatingWindowGFG extends AccessibilityService implements Lifecycle
 
                     @Override
                     public void onSuccess(@io.reactivex.rxjava3.annotations.NonNull Boolean aBoolean) {
-                        floatView.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.radius_color, null));
+                        floatView.setVisibility(View.VISIBLE);
                         windowManager.updateViewLayout(floatView, layoutParam);
                     }
 
@@ -215,7 +211,7 @@ public class FloatingWindowGFG extends AccessibilityService implements Lifecycle
 
                     }
                 });
-                return true;
+                return false;
             }
 
             @Override
@@ -242,9 +238,34 @@ public class FloatingWindowGFG extends AccessibilityService implements Lifecycle
                     Completable.fromAction(() -> SystemUtils.startCommand("input keyevent 4"))
                             .subscribeOn(Schedulers.single()).subscribe();
                 } else if (Math.abs(e1.getX() - e2.getX()) < 200 && e2.getY() - e1.getY() > 300) {
+                    //down
+                    floatView.setVisibility(View.GONE);
+//                    floatView.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.trasparent_color, null));
+//                    windowManager.updateViewLayout(floatView, layoutParam);
+                    Single.create((SingleOnSubscribe<Boolean>) emitter -> {
+                        SystemUtils.startCommand("screencap -p " +
+                                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) +
+                                File.separator + System.currentTimeMillis() + ".png");
+                        emitter.onSuccess(true);
+                    }).subscribeOn(Schedulers.single()).observeOn(AndroidSchedulers.mainThread()).subscribe(new SingleObserver<Boolean>() {
+                        @Override
+                        public void onSubscribe(@io.reactivex.rxjava3.annotations.NonNull Disposable d) {
 
-                    Completable.fromAction(() -> SystemUtils.startCommand("input keyevent 4"))
-                            .subscribeOn(Schedulers.single()).subscribe();
+                        }
+
+                        @Override
+                        public void onSuccess(@io.reactivex.rxjava3.annotations.NonNull Boolean aBoolean) {
+                            floatView.setVisibility(View.VISIBLE);
+//                            floatView.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.radius_color, null));
+//                            windowManager.updateViewLayout(floatView, layoutParam);
+                        }
+
+                        @Override
+                        public void onError(@io.reactivex.rxjava3.annotations.NonNull Throwable e) {
+
+                        }
+                    });
+
                 } else if (Math.abs(e1.getX() - e2.getX()) < 200 && e1.getY() - e2.getY() > 300) {
 
                     Completable.fromAction(() -> SystemUtils.startCommand("input keyevent 3"))
