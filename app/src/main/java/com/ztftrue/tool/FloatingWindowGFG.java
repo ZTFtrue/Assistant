@@ -75,17 +75,17 @@ public class FloatingWindowGFG extends AccessibilityService implements Lifecycle
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        // Check the new orientation
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             if (floatView != null && layoutParamLandScape != null && windowManager != null && currentOrientationPortrait) {
                 currentOrientationPortrait = false;
-                windowManager.updateViewLayout(floatView, layoutParamLandScape);
+                currentLayoutParam=layoutParamLandScape;
+                windowManager.updateViewLayout(floatView, currentLayoutParam);
             }
         } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
             if (floatView != null && layoutParam != null && windowManager != null && !currentOrientationPortrait) {
-                Log.i("TAG", "Orientation : PORTRAIT");
                 currentOrientationPortrait = true;
-                windowManager.updateViewLayout(floatView, layoutParam);
+                currentLayoutParam=layoutParam;
+                windowManager.updateViewLayout(floatView, currentLayoutParam);
             }
         }
     }
@@ -125,7 +125,7 @@ public class FloatingWindowGFG extends AccessibilityService implements Lifecycle
     boolean isMoveButton = false;
     WindowManager.LayoutParams layoutParam;
     WindowManager.LayoutParams layoutParamLandScape;
-
+    WindowManager.LayoutParams currentLayoutParam;
     @SuppressLint("ClickableViewAccessibility")
     public void createFloatWindow() {
 
@@ -149,6 +149,7 @@ public class FloatingWindowGFG extends AccessibilityService implements Lifecycle
                 WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                 PixelFormat.TRANSPARENT
         );
+        currentLayoutParam=layoutParam;
         layoutParamLandScape.gravity = Gravity.TOP | Gravity.START;
         layoutParamLandScape.x = 0;
         layoutParamLandScape.y = 0;
@@ -181,18 +182,18 @@ public class FloatingWindowGFG extends AccessibilityService implements Lifecycle
                             int movedY = nowY - py;
                             px = nowX;
                             py = nowY;
-                            layoutParam.x = layoutParam.x + movedX;
-                            layoutParam.y = layoutParam.y + movedY;
+                            currentLayoutParam.x = currentLayoutParam.x + movedX;
+                            currentLayoutParam.y = currentLayoutParam.y + movedY;
 
-                            windowManager.updateViewLayout(floatView, layoutParam);
+                            windowManager.updateViewLayout(floatView, currentLayoutParam);
                             break;
                         case MotionEvent.ACTION_UP:
-                            if (layoutParam.x > width / 2) {
-                                layoutParam.x = width - viewWidth;
+                            if (currentLayoutParam.x > width / 2) {
+                                currentLayoutParam.x = width - viewWidth;
                             } else {
-                                layoutParam.x = 0;
+                                currentLayoutParam.x = 0;
                             }
-                            windowManager.updateViewLayout(v, layoutParam);
+                            windowManager.updateViewLayout(v, currentLayoutParam);
                             isMoveButton = false;
                             break;
                     }
@@ -201,7 +202,7 @@ public class FloatingWindowGFG extends AccessibilityService implements Lifecycle
                 return true;
             }
         });
-        windowManager.addView(floatView, layoutParam);
+        windowManager.addView(floatView, currentLayoutParam);
     }
 
     GestureDetector gestureDetector;
@@ -221,7 +222,7 @@ public class FloatingWindowGFG extends AccessibilityService implements Lifecycle
             @Override
             public boolean onSingleTapUp(@NonNull MotionEvent e) {
                 floatView.setVisibility(View.GONE);
-                windowManager.updateViewLayout(floatView, layoutParam);
+                windowManager.updateViewLayout(floatView, currentLayoutParam);
                 Single.create((SingleOnSubscribe<Boolean>) emitter -> {
                     SystemUtils.startCommand("input tap " + e.getRawX() + " " + e.getRawY());
                     emitter.onSuccess(true);
@@ -235,7 +236,7 @@ public class FloatingWindowGFG extends AccessibilityService implements Lifecycle
                     public void onSuccess(@io.reactivex.rxjava3.annotations.NonNull Boolean aBoolean) {
 
                         floatView.setVisibility(View.VISIBLE);
-                        windowManager.updateViewLayout(floatView, layoutParam);
+                        windowManager.updateViewLayout(floatView, currentLayoutParam);
                     }
 
                     @Override
