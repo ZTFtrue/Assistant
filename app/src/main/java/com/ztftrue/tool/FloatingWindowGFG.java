@@ -3,7 +3,10 @@ package com.ztftrue.tool;
 import android.accessibilityservice.AccessibilityService;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.PixelFormat;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.VibrationEffect;
@@ -21,7 +24,6 @@ import android.view.accessibility.AccessibilityEvent;
 import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.res.ResourcesCompat;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LifecycleRegistry;
@@ -38,7 +40,7 @@ import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class FloatingWindowGFG extends AccessibilityService implements LifecycleOwner {
-    public static MutableLiveData<Boolean> isShowWindow = new MutableLiveData<Boolean>(false);
+    public static MutableLiveData<Boolean> isShowWindow = new MutableLiveData<>(false);
     final private LifecycleRegistry mLifecycleRegistry = new LifecycleRegistry(this);
     private Vibrator vibrator;
 
@@ -55,6 +57,7 @@ public class FloatingWindowGFG extends AccessibilityService implements Lifecycle
 
     }
 
+    boolean currentOrientationPortrait = true;
 
     @Override
     public void onCreate() {
@@ -66,18 +69,32 @@ public class FloatingWindowGFG extends AccessibilityService implements Lifecycle
         initObserve();
     }
 
+    SensorEventListener m_sensorEventListener;
     Handler handler = new Handler();
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        // Check the new orientation
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            if (floatView != null && layoutParamLandScape != null && windowManager != null && currentOrientationPortrait) {
+                currentOrientationPortrait = false;
+                windowManager.updateViewLayout(floatView, layoutParamLandScape);
+            }
+        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            if (floatView != null && layoutParam != null && windowManager != null && !currentOrientationPortrait) {
+                Log.i("TAG", "Orientation : PORTRAIT");
+                currentOrientationPortrait = true;
+                windowManager.updateViewLayout(floatView, layoutParam);
+            }
+        }
+    }
 
     /**
      * 打开关闭的订阅
      */
     private void initObserve() {
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                createFloatWindow();
-            }
-        }, 1000);
+        handler.postDelayed(this::createFloatWindow, 1000);
         isShowWindow.observe(this, aBoolean -> {
             if (aBoolean) {
                 if (floatView == null)
@@ -92,6 +109,10 @@ public class FloatingWindowGFG extends AccessibilityService implements Lifecycle
     @Override
     public void onDestroy() {
         super.onDestroy();
+        if (m_sensorEventListener != null) {
+            SensorManager sm = (SensorManager) getSystemService(SENSOR_SERVICE);
+            sm.unregisterListener(m_sensorEventListener);
+        }
         mLifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY);
         windowManager.removeView(floatView);
         vibrator.cancel();
@@ -99,10 +120,12 @@ public class FloatingWindowGFG extends AccessibilityService implements Lifecycle
 
     WindowManager windowManager;
     ViewGroup floatView;
-    int viewWidth = 200;
+    int viewWidth = 140;
     int viewHeight = 600;
     boolean isMoveButton = false;
     WindowManager.LayoutParams layoutParam;
+    WindowManager.LayoutParams layoutParamLandScape;
+
     @SuppressLint("ClickableViewAccessibility")
     public void createFloatWindow() {
 
@@ -119,6 +142,16 @@ public class FloatingWindowGFG extends AccessibilityService implements Lifecycle
                 WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                 PixelFormat.TRANSPARENT
         );
+        layoutParamLandScape = new WindowManager.LayoutParams(
+                80,
+                metrics.heightPixels,
+                WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                PixelFormat.TRANSPARENT
+        );
+        layoutParamLandScape.gravity = Gravity.TOP | Gravity.START;
+        layoutParamLandScape.x = 0;
+        layoutParamLandScape.y = 0;
         layoutParam.gravity = Gravity.TOP | Gravity.START;
         layoutParam.x = 0;
         layoutParam.y = 0;
@@ -174,8 +207,6 @@ public class FloatingWindowGFG extends AccessibilityService implements Lifecycle
     GestureDetector gestureDetector;
 
     public void initGestureDetector() {
-
-
         gestureDetector = new GestureDetector(this, new GestureDetector.OnGestureListener() {
             @Override
             public boolean onDown(@NonNull MotionEvent e) {
@@ -192,9 +223,9 @@ public class FloatingWindowGFG extends AccessibilityService implements Lifecycle
                 floatView.setVisibility(View.GONE);
                 windowManager.updateViewLayout(floatView, layoutParam);
                 Single.create((SingleOnSubscribe<Boolean>) emitter -> {
-                    SystemUtils.startCommand("input tap "+e.getRawX()+" "+e.getRawY());
+                    SystemUtils.startCommand("input tap " + e.getRawX() + " " + e.getRawY());
                     emitter.onSuccess(true);
-                }).subscribeOn(Schedulers.single()).observeOn(AndroidSchedulers.mainThread()).subscribe(new SingleObserver<Boolean>() {
+                }).subscribeOn(Schedulers.single()).observeOn(AndroidSchedulers.mainThread()).subscribe(new SingleObserver<>() {
                     @Override
                     public void onSubscribe(@io.reactivex.rxjava3.annotations.NonNull Disposable d) {
 
@@ -202,6 +233,7 @@ public class FloatingWindowGFG extends AccessibilityService implements Lifecycle
 
                     @Override
                     public void onSuccess(@io.reactivex.rxjava3.annotations.NonNull Boolean aBoolean) {
+
                         floatView.setVisibility(View.VISIBLE);
                         windowManager.updateViewLayout(floatView, layoutParam);
                     }
@@ -240,14 +272,12 @@ public class FloatingWindowGFG extends AccessibilityService implements Lifecycle
                 } else if (Math.abs(e1.getX() - e2.getX()) < 200 && e2.getY() - e1.getY() > 300) {
                     //down
                     floatView.setVisibility(View.GONE);
-//                    floatView.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.trasparent_color, null));
-//                    windowManager.updateViewLayout(floatView, layoutParam);
                     Single.create((SingleOnSubscribe<Boolean>) emitter -> {
                         SystemUtils.startCommand("screencap -p " +
                                 Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) +
                                 File.separator + System.currentTimeMillis() + ".png");
                         emitter.onSuccess(true);
-                    }).subscribeOn(Schedulers.single()).observeOn(AndroidSchedulers.mainThread()).subscribe(new SingleObserver<Boolean>() {
+                    }).subscribeOn(Schedulers.single()).observeOn(AndroidSchedulers.mainThread()).subscribe(new SingleObserver<>() {
                         @Override
                         public void onSubscribe(@io.reactivex.rxjava3.annotations.NonNull Disposable d) {
 
@@ -256,8 +286,6 @@ public class FloatingWindowGFG extends AccessibilityService implements Lifecycle
                         @Override
                         public void onSuccess(@io.reactivex.rxjava3.annotations.NonNull Boolean aBoolean) {
                             floatView.setVisibility(View.VISIBLE);
-//                            floatView.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.radius_color, null));
-//                            windowManager.updateViewLayout(floatView, layoutParam);
                         }
 
                         @Override
