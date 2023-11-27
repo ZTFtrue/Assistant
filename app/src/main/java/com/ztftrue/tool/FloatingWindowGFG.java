@@ -143,7 +143,7 @@ public class FloatingWindowGFG extends AccessibilityService implements Lifecycle
                 PixelFormat.TRANSPARENT
         );
         layoutParamLandScape = new WindowManager.LayoutParams(
-                80,
+                100,
                 metrics.heightPixels,
                 WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
                 WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
@@ -234,9 +234,10 @@ public class FloatingWindowGFG extends AccessibilityService implements Lifecycle
 
                     @Override
                     public void onSuccess(@io.reactivex.rxjava3.annotations.NonNull Boolean aBoolean) {
-
-                        floatView.setVisibility(View.VISIBLE);
-                        windowManager.updateViewLayout(floatView, currentLayoutParam);
+                        handler.postDelayed(() -> {
+                            floatView.setVisibility(View.VISIBLE);
+                            windowManager.updateViewLayout(floatView, currentLayoutParam);
+                        }, 500);
                     }
 
                     @Override
