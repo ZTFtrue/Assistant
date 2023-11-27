@@ -155,7 +155,7 @@ public class FloatingWindowGFG extends AccessibilityService implements Lifecycle
         layoutParamLandScape.y = 0;
         layoutParam.gravity = Gravity.TOP | Gravity.START;
         layoutParam.x = 0;
-        layoutParam.y = 0;
+        layoutParam.y = 1180;
         windowManager.getDefaultDisplay().getMetrics(metrics);
 
         floatView.setLayoutParams(new FrameLayout.LayoutParams(viewWidth, viewHeight));
@@ -237,7 +237,7 @@ public class FloatingWindowGFG extends AccessibilityService implements Lifecycle
                         handler.postDelayed(() -> {
                             floatView.setVisibility(View.VISIBLE);
                             windowManager.updateViewLayout(floatView, currentLayoutParam);
-                        }, 500);
+                        }, 300);
                     }
 
                     @Override
