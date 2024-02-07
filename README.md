@@ -41,7 +41,11 @@ adb shell settings put secure show_rotation_suggestions
 
 ```shell
 adb shell device_config put systemui clipboard_overlay_enabled false
+#adb reboot
 ```
+需要重启手机
+
+https://stackoverflow.com/questions/72313763/how-to-disable-clipboard-editor-overlay-android-emulator-api-33
 
 NFC控制
 
