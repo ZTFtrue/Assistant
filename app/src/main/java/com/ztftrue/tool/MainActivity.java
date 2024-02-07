@@ -89,6 +89,9 @@ public class MainActivity extends AppCompatActivity {
         } else if (view.getId() == R.id.close_screen_orientation) {
 //            https://source.android.com/docs/core/display/rotate-suggestions?hl=zh-cn
             executeCommand("settings put secure show_rotation_suggestions");
+        } else if (view.getId() == R.id.close_clipbord) {
+            executeCommand("device_config put systemui clipboard_overlay_enabled false");
+            Toast.makeText(this, "已关闭剪贴板提醒,需要重启才能生效", Toast.LENGTH_SHORT).show();
         }
     }
 
