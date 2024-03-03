@@ -12,7 +12,6 @@ import android.os.Handler;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -78,13 +77,13 @@ public class FloatingWindowGFG extends AccessibilityService implements Lifecycle
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             if (floatView != null && layoutParamLandScape != null && windowManager != null && currentOrientationPortrait) {
                 currentOrientationPortrait = false;
-                currentLayoutParam=layoutParamLandScape;
+                currentLayoutParam = layoutParamLandScape;
                 windowManager.updateViewLayout(floatView, currentLayoutParam);
             }
         } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
             if (floatView != null && layoutParam != null && windowManager != null && !currentOrientationPortrait) {
                 currentOrientationPortrait = true;
-                currentLayoutParam=layoutParam;
+                currentLayoutParam = layoutParam;
                 windowManager.updateViewLayout(floatView, currentLayoutParam);
             }
         }
@@ -121,11 +120,12 @@ public class FloatingWindowGFG extends AccessibilityService implements Lifecycle
     WindowManager windowManager;
     ViewGroup floatView;
     int viewWidth = 140;
-    int viewHeight = 600;
+    int viewHeight = 300;
     boolean isMoveButton = false;
     WindowManager.LayoutParams layoutParam;
     WindowManager.LayoutParams layoutParamLandScape;
     WindowManager.LayoutParams currentLayoutParam;
+
     @SuppressLint("ClickableViewAccessibility")
     public void createFloatWindow() {
 
@@ -143,16 +143,16 @@ public class FloatingWindowGFG extends AccessibilityService implements Lifecycle
                 PixelFormat.TRANSPARENT
         );
         layoutParamLandScape = new WindowManager.LayoutParams(
-                100,
-                metrics.heightPixels,
+                80,
+                width / 4,
                 WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
                 WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                 PixelFormat.TRANSPARENT
         );
-        currentLayoutParam=layoutParam;
+        currentLayoutParam = layoutParam;
         layoutParamLandScape.gravity = Gravity.TOP | Gravity.START;
         layoutParamLandScape.x = 0;
-        layoutParamLandScape.y = 0;
+        layoutParamLandScape.y = width / 3;
         layoutParam.gravity = Gravity.TOP | Gravity.START;
         layoutParam.x = 0;
         layoutParam.y = 1180;
@@ -216,7 +216,6 @@ public class FloatingWindowGFG extends AccessibilityService implements Lifecycle
 
             @Override
             public void onShowPress(@NonNull MotionEvent e) {
-                Log.d("TAG", "onShowPress");
             }
 
             @Override
@@ -255,7 +254,6 @@ public class FloatingWindowGFG extends AccessibilityService implements Lifecycle
 
             @Override
             public void onLongPress(@NonNull MotionEvent e) {
-                Log.d("TAG", "Long press");
                 // Vibrate for 500 milliseconds
                 VibrationEffect vibrationEffect = VibrationEffect.createOneShot(1000, VibrationEffect.DEFAULT_AMPLITUDE);
                 vibrator.vibrate(vibrationEffect);
@@ -268,16 +266,19 @@ public class FloatingWindowGFG extends AccessibilityService implements Lifecycle
                     return false;
                 }
                 if (Math.abs(e1.getX() - e2.getX()) > 100 && Math.abs(e1.getY() - e2.getY()) < 300) {
+                    performGlobalAction(GLOBAL_ACTION_BACK);
                     // Back
-                    Completable.fromAction(() -> SystemUtils.startCommand("input keyevent 4"))
-                            .subscribeOn(Schedulers.single()).subscribe();
+//                    Completable.fromAction(() -> SystemUtils.startCommand("input keyevent 4"))
+//                            .subscribeOn(Schedulers.single()).subscribe();
                 } else if (Math.abs(e1.getX() - e2.getX()) < 200 && e2.getY() - e1.getY() > 300) {
                     //down
                     floatView.setVisibility(View.GONE);
+                    String filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) +
+                            File.separator + System.currentTimeMillis() + ".png";
                     Single.create((SingleOnSubscribe<Boolean>) emitter -> {
-                        SystemUtils.startCommand("screencap -p " +
-                                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) +
-                                File.separator + System.currentTimeMillis() + ".png");
+                        SystemUtils.startCommand("screencap -p " + filePath
+                        );
+//                        SystemUtils.startCommand("su -lp 2000 -c \"cmd notification post -S bigtext -t 'Screen Capture' 'Tag' 'Ok'\"");
                         emitter.onSuccess(true);
                     }).subscribeOn(Schedulers.single()).observeOn(AndroidSchedulers.mainThread()).subscribe(new SingleObserver<>() {
                         @Override
@@ -288,6 +289,13 @@ public class FloatingWindowGFG extends AccessibilityService implements Lifecycle
                         @Override
                         public void onSuccess(@io.reactivex.rxjava3.annotations.NonNull Boolean aBoolean) {
                             floatView.setVisibility(View.VISIBLE);
+                            CreateNotification createNotification = new CreateNotification();
+                            createNotification
+                                    .createForegroundNotification(FloatingWindowGFG.this,
+                                            "Screen Capture", filePath);
+                            handler.postDelayed(() -> {
+                                createNotification.cancelNotification(FloatingWindowGFG.this);
+                            }, 1000);
                         }
 
                         @Override
@@ -297,7 +305,7 @@ public class FloatingWindowGFG extends AccessibilityService implements Lifecycle
                     });
 
                 } else if (Math.abs(e1.getX() - e2.getX()) < 200 && e1.getY() - e2.getY() > 300) {
-
+                    performGlobalAction(GLOBAL_ACTION_HOME);
                     Completable.fromAction(() -> SystemUtils.startCommand("input keyevent 3"))
                             .subscribeOn(Schedulers.single()).subscribe();
                 }
