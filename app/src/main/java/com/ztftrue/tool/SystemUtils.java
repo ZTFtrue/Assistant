@@ -13,13 +13,14 @@ import java.io.OutputStreamWriter;
 
 public class SystemUtils {
 
-@Deprecated
+    @Deprecated
     public void returnHome(Context context) {
         Intent home = new Intent(Intent.ACTION_MAIN);
         home.addCategory(Intent.CATEGORY_HOME);
         startActivity(home, context);
     }
-@Deprecated
+
+    @Deprecated
     public void startApplication(ResolveInfo info, Context context) {
         //该应用的包名
         String pkg = info.activityInfo.packageName;

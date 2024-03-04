@@ -15,13 +15,44 @@ Assistant
 
 ## Command
 
+浮动通知
+
 0 disable , 1 enable
 
-```bash
-settings put global heads_up_notifications_enabled 0
+```shell
+adb shell settings put global heads_up_notifications_enabled 0
 # settings put system screen_brightness_mode 1
 # settings get system screen_brightness 10
 ```
+
+Android12 快捷栏 显示 wifi 和 蜂窝按钮，只能在android12 使用
+
+```shell
+adb shell settings put secure sysui_qs_tiles "$(settings get secure sysui_qs_tiles),wifi,cell"
+```
+
+关闭横屏时候的旋转提示
+
+```shell
+adb shell settings put secure show_rotation_suggestions
+```
+
+关闭剪贴板提示
+
+```shell
+adb shell device_config put systemui clipboard_overlay_enabled false
+#adb reboot
+```
+需要重启手机
+
+https://stackoverflow.com/questions/72313763/how-to-disable-clipboard-editor-overlay-android-emulator-api-33
+
+NFC控制
+
+```shell
+adb shell svc nfc disable
+```
+
 
 ## TODO
 
